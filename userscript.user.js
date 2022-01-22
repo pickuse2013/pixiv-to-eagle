@@ -22,11 +22,11 @@
 // @run-at       context-menu
 
 // @require      https://code.jquery.com/jquery-3.5.1.min.js
-// @require      https://greasyfork.org/scripts/2199-waitforkeyelements/code/waitForKeyElements.js?version=6349
+// @require      https://gist.githubusercontent.com/BrockA/2625891/raw/9c97aa67ff9c5d56be34a55ad6c18a314e5eb548/waitForKeyElements.js
 
 // @date         08/28/2020
-// @modified     08/28/2020
-// @version      0.0.1
+// @modified     01/21/2022
+// @version      0.0.2
 
 // ==/UserScript==
 'use strict';
