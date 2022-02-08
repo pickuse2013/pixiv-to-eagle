@@ -21,19 +21,79 @@
 // @grant        GM_addStyle
 // @run-at       context-menu
 
+// @connect      localhost
+// @connect      www.pixiv.net
+// @connect      i.pximg.net
+
 // @require      https://code.jquery.com/jquery-3.5.1.min.js
-// @require      https://gist.githubusercontent.com/BrockA/2625891/raw/9c97aa67ff9c5d56be34a55ad6c18a314e5eb548/waitForKeyElements.js
 
 // @date         08/28/2020
-// @modified     01/21/2022
-// @version      0.0.2
+// @modified     02/08/2022
+// @version      0.0.3
 
 // ==/UserScript==
 'use strict';
 
 (function () {
+    // waitForKeyElements.js
+    function waitForKeyElements(
+        selectorTxt,
+        actionFunction,
+        bWaitOnce,
+        iframeSelector
+    ) {
+        var targetNodes, btargetsFound;
 
-    $("body").append(`<div id="save-to-eagle-dialog" style="background-color: aquamarine; display: block; position: fixed; top: 200px; width: 300px;  padding: 25px 30px; margin: 5% auto; left: 0; right: 0; text-align: center; box-shadow: 4px 4px 4px 3px rgba(0, 0, 0, 0.2); border-radius: 10px;">prepare to start ...</div>`);
+        if (typeof iframeSelector == "undefined")
+            targetNodes = $(selectorTxt);
+        else
+            targetNodes = $(iframeSelector).contents()
+            .find(selectorTxt);
+
+        if (targetNodes && targetNodes.length > 0) {
+            btargetsFound = true;
+            targetNodes.each(function () {
+                var jThis = $(this);
+                var alreadyFound = jThis.data('alreadyFound') || false;
+
+                if (!alreadyFound) {
+                    //--- Call the payload function.
+                    var cancelFound = actionFunction(jThis);
+                    if (cancelFound)
+                        btargetsFound = false;
+                    else
+                        jThis.data('alreadyFound', true);
+                }
+            });
+        } else {
+            btargetsFound = false;
+        }
+
+        var controlObj = waitForKeyElements.controlObj || {};
+        var controlKey = selectorTxt.replace(/[^\w]/g, "_");
+        var timeControl = controlObj[controlKey];
+
+        if (btargetsFound && bWaitOnce && timeControl) {
+            clearInterval(timeControl);
+            delete controlObj[controlKey]
+        } else {
+            if (!timeControl) {
+                timeControl = setInterval(function () {
+                        waitForKeyElements(selectorTxt,
+                            actionFunction,
+                            bWaitOnce,
+                            iframeSelector
+                        );
+                    },
+                    300
+                );
+                controlObj[controlKey] = timeControl;
+            }
+        }
+        waitForKeyElements.controlObj = controlObj;
+    }
+
+    $("body").append(`<div id="save-to-eagle-dialog" style="background-color: aquamarine !important; display: none; position: fixed !important; top: 200px !important; width: 300px !important;  padding: 25px 30px !important; margin: 5% auto; left: 0 !important; right: 0 !important; text-align: center; box-shadow: 4px 4px 4px 3px rgba(0, 0, 0, 0.2) !important; border-radius: 10px !important; height: unset !important;">prepare to start ...</div>`);
 
     if (location.href.indexOf("pixiv.") === -1) {
         alert("This script only works on pixiv.net.");
@@ -89,16 +149,14 @@
         });
     }
 
-    function updateDialog()
-    {
+    function updateDialog() {
         $(SELECTOR_DIALOG).html(`Downloading...<br>${DOWNLOAD_COUNTER} download.`);
         //$(SELECTOR_DIALOG).html(`Downloading...<br>${DOWNLOAD_COUNTER}/${TOTAL_COUNTER}`);
 
-        if(FINISH == true)
-        {
+        if (FINISH == true) {
             $(SELECTOR_DIALOG).html(`Download<br>Complate!`);
-            setTimeout(function(){
-                $(SELECTOR_DIALOG).fadeOut();
+            setTimeout(function () {
+                $(SELECTOR_DIALOG).remove();
             }, 1000);
         }
     }
@@ -150,8 +208,7 @@
                         }
                     };
 
-                    if(SUPPORT_TAGS)
-                    {
+                    if (SUPPORT_TAGS) {
                         image.tags = IMAGE_TAGS;
                     }
 
@@ -161,7 +218,7 @@
                     updateDialog();
 
                 }
-                if(index == $(SELECTOR_IMAGE).length - 1){
+                if (index == $(SELECTOR_IMAGE).length - 1) {
                     FINISH = true;
                 }
                 updateDialog();
