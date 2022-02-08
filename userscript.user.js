@@ -93,7 +93,7 @@
         waitForKeyElements.controlObj = controlObj;
     }
 
-    $("body").append(`<div id="save-to-eagle-dialog" style="background-color: aquamarine !important; display: none; position: fixed !important; top: 200px !important; width: 300px !important;  padding: 25px 30px !important; margin: 5% auto; left: 0 !important; right: 0 !important; text-align: center; box-shadow: 4px 4px 4px 3px rgba(0, 0, 0, 0.2) !important; border-radius: 10px !important; height: unset !important;">prepare to start ...</div>`);
+    $("body").append(`<div id="save-to-eagle-dialog" style="background-color: aquamarine !important; display: block; position: fixed !important; top: 200px !important; width: 300px !important;  padding: 25px 30px !important; margin: 5% auto; left: 0 !important; right: 0 !important; text-align: center; box-shadow: 4px 4px 4px 3px rgba(0, 0, 0, 0.2) !important; border-radius: 10px !important; height: unset !important;">prepare to start ...</div>`);
 
     if (location.href.indexOf("pixiv.") === -1) {
         alert("This script only works on pixiv.net.");
